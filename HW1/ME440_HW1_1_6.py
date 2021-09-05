@@ -24,7 +24,7 @@ def vorticity(r, t):
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
 
-r = np.linspace(0, 10, 1000)
+r = np.linspace(0.000001, 10, 1000)
 t = [0.000001, 0.5, 1., 2., 4., 8., 16., 32., 64., 128.]
 
 for _t in t:
