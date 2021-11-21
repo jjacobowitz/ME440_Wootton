@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 10 22:12:13 2021
+Jared Jacobowitz
+10 November 2021 (Fall 2021)
+ME440 Advanced Fluid Mechanics
 
-@author: Jared
+Solving for the conditions of the Blasius equation for boundary layer flow
 """
 from scipy.optimize import root_scalar
 from scipy.integrate import solve_ivp
