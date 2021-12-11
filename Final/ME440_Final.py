@@ -84,15 +84,15 @@ plt.plot(U*(y/h+1)/2, y, label="Laminar")
 plt.ylim(-h, h)
 plt.xlim(0, U)
 
-plt.xlabel(r"Mean Velocity ($\bar{u}(y)$)")
-plt.ylabel(r"Position ($y$)")
+plt.xlabel(r"Mean Velocity $\bar{u}(y)$ [m/s]")
+plt.ylabel(r"Position $y$ [m]")
 
 plt.title("Position vs. Fluid Velocity, Couette Flow")
 plt.legend()
 plt.tight_layout()
 plt.show()
 
-plt.savefig("ME440_Final_P3f.png")
+plt.savefig("ME440_Final_P3f.png", dpi=200)
 
 # =============================================================================
 # Problem 3g
@@ -114,4 +114,4 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-plt.savefig("ME440_Final_P3g.png")
+plt.savefig("ME440_Final_P3g.png", dpi=200)
