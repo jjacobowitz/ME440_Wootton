@@ -8,11 +8,48 @@ Final Exam
 Problem 3 code
 """
 import numpy as np
-from scipy.optimize import root_scalar
+# from scipy.optimize import root_scalar
 import matplotlib.pyplot as plt
 
 plt.close("all")
 
+# =============================================================================
+# Functions
+# =============================================================================
+def Cf_implicit(Cf, Re, h, nu, kappa, B):
+    """Implicit function for the friction coefficient found using the law of
+    the wall and applying a symmetry boundary condition
+    """
+    return 8/(2*np.log(Re*np.sqrt(Cf/8))/kappa + 2*B)**2
+
+
+def u_func(y, vstar, nu, h, kappa, B):
+    """Top and bottom velocity functions using the law of the wall"""
+    # Bottom
+    if -h < y < 0:
+        r = y + h
+        return vstar*(np.log(vstar*r/nu)/kappa + B)
+    # Top
+    else:
+        r = h - y
+        return U - (vstar*(np.log(vstar*r/nu)/kappa + B))
+
+
+def dudy_func(y, vstar, kappa, h):
+    """Derivative of the velocity profile for the eddy viscosity calculation"""
+    m = 1       # for changing the sign on y
+    # Bottom
+    if -h < y < 0:
+        m = 1
+    # Top
+    else:
+        m = -1
+    return vstar/kappa/(h+m*y)
+
+
+# =============================================================================
+# Parameters
+# =============================================================================
 kappa = 0.41
 B = 5.0
 rho = 1.2           # kg/m^3; density of air
@@ -21,60 +58,60 @@ nu = mu/rho         # m^2/s; kinematic viscosity of air
 h = 0.01            # m; half gap width
 Re = 1e4            # Reynolds number
 
-
-# def Cf_implicit(Cf, Re, h, nu, kappa, B):
-#     return np.sqrt(8/Cf) - 2*np.log(Re*np.sqrt(Cf/8))/kappa - B
-
-
-# Cf = root_scalar(Cf_implicit, args=(Re, h, nu, kappa, B), x0=0.1, x1=1)
-# print(Cf)
-
-
-def Cf_implicit(Cf, Re, h, nu, kappa, B):
-    return 8/(2*np.log(Re*np.sqrt(Cf/8))/kappa + 2*B)**2
-    # return Re/4/(np.log(np.sqrt(Re*Cf)/2)/kappa + B)**2
-
-
+# =============================================================================
+# Problem 3f
+# =============================================================================
+# Iteratively solving for the friction coefficient
 Cf_old = 100
 Cf = Cf_implicit(Cf_old, Re, h, nu, kappa, B)
-while abs((Cf_old-Cf)/Cf_old) > 1e-6:
+rtol = 1e-6
+while abs((Cf_old-Cf)/Cf_old) > rtol:
     Cf_old, Cf = Cf, Cf_implicit(Cf, Re, h, nu, kappa, B)
-print(Cf)
+print(f"{Cf=}")
 
+# Computing secondary values
 U = Re*nu/h
 tau_w = Cf*rho*U**2/8
 vstar = np.sqrt(tau_w/rho)
 
-
-def u(y, vstar, nu, h, kappa, B):
-    if -h < y < 0:
-        r = y + h
-        return vstar*(np.log(vstar*r/nu)/kappa + B)
-    else:
-        r = h - y
-        return U - (vstar*(np.log(vstar*r/nu)/kappa + B))
-
-
 y = np.linspace(-h+1e-10, h-1e-10, 1000)
 plt.figure()
-uy = [u(_y, vstar, nu, h, kappa, B) for _y in y]
-plt.plot(uy, y)
-# plt.plot(tau_w*y, y)
+u = [u_func(_y, vstar, nu, h, kappa, B) for _y in y]
+
+plt.plot(u, y, label="Turbulent")
+plt.plot(U*(y/h+1)/2, y, label="Laminar")
+
 plt.ylim(-h, h)
-plt.xlabel(r"Velocity ($\bar{u}(y)$)")
+plt.xlim(0, U)
+
+plt.xlabel(r"Mean Velocity ($\bar{u}(y)$)")
 plt.ylabel(r"Position ($y$)")
+
+plt.title("Position vs. Fluid Velocity, Couette Flow")
+plt.legend()
 plt.tight_layout()
 plt.show()
 
+plt.savefig("ME440_Final_P3f.png")
 
-def mu_T(y, vstar, nu):
-    if -h < y < 0:
-        return vstar/nu/y
-    else:
-        return -vstar/nu/y
-
+# =============================================================================
+# Problem 3g
+# =============================================================================
+# Eddy viscosity calculation
+dudy = np.array([dudy_func(_y, vstar, kappa, h) for _y in y])
+mu_T = tau_w/dudy
 
 plt.figure()
-mu_Ty = [mu_T(_y, vstar, nu) for _y in y]
-plt.plot(mu_Ty, y)
+plt.plot(mu_T, y, label="Eddy Viscosity")
+plt.plot([mu for _ in y], y, label="Molecular Viscosity")
+
+plt.xticks(rotation=45)
+plt.xlabel("Viscosity [kg/m/s]")
+plt.ylabel("Position [m]")
+plt.title("Position vs. Fluid Viscosity, Couette Flow")
+
+plt.legend()
+plt.tight_layout()
 plt.show()
+
+plt.savefig("ME440_Final_P3g.png")
