@@ -103,7 +103,7 @@ mu_T = tau_w/dudy
 
 plt.figure()
 plt.plot(mu_T, y, label="Eddy Viscosity")
-plt.plot([mu for _ in y], y, label="Molecular Viscosity")
+plt.axvline(mu, color="tab:orange", label="Molecular Viscosity")
 
 plt.xticks(rotation=45)
 plt.xlabel("Viscosity [kg/m/s]")
