@@ -5,7 +5,7 @@ Fall 2021
 ME440 Advanced Fluid Mechanics
 Final Exam
 
-Problem 3 code
+Code for problem 3, turbulent Couette flow
 """
 import numpy as np
 # from scipy.optimize import root_scalar
@@ -57,6 +57,7 @@ mu = 1.8e-5         # kg/m/s; dynamics viscosity of air
 nu = mu/rho         # m^2/s; kinematic viscosity of air
 h = 0.01            # m; half gap width
 Re = 1e4            # Reynolds number
+y = np.linspace(-h+1e-10, h-1e-10, 1000)
 
 # =============================================================================
 # Problem 3f
@@ -74,7 +75,6 @@ U = Re*nu/h
 tau_w = Cf*rho*U**2/8
 vstar = np.sqrt(tau_w/rho)
 
-y = np.linspace(-h+1e-10, h-1e-10, 1000)
 plt.figure()
 u = [u_func(_y, vstar, nu, h, kappa, B) for _y in y]
 
